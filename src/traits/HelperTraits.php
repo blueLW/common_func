@@ -73,60 +73,80 @@ trait HelperTraits{
     }
 
 
-    /**将指定数字转换成6位邀请码
+    /**将指定数字转换成特殊码(6位以上)
      * @param int $userId
      * @return string
      * @time 2020/11/17 16:13
      * @author LW
      */
-    public function userIdSwitchCode(int $userId){
-        $map = [
+    function userIdSwitchCode(int $userId){
+        //位标识
+        $bit_map = [
             'G','H','I','J','K','L','O','M','N','P','Q','R','S','T','U','V','W','X','Y','Z'
         ];
         $diff = 7- (int)strlen($userId);
         if($diff > 0){
-            $bit_one = $map[abs($diff)];
-            $code = $bit_one.sprintf('%06s', $userId);
+            $bit_one = $bit_map[$diff];
+            $dechex_code = strtoupper(dechex($userId));
+            $bit_zero_len = 5 - (int)strlen($dechex_code);
+            $bit_zero_string = $bit_zero_len > 0 ? $bit_map[$diff + $bit_zero_len] : '';
+            if($bit_zero_len > 2){
+                for ($i=2;$i<= $bit_zero_len;$i++){
+                    if($i % 2 == 0){
+                        $bit_zero_string .= $bit_map[$i+$diff];
+                        continue;
+                    }
+                    $bit_zero_string .= 0;
+                }
+            }else if($bit_zero_len == 2){
+                $bit_zero_string .= 0;
+            }
+            $code = $bit_one.trim($bit_zero_string).$dechex_code;
         }else{
             $code = strtoupper(dechex($userId));
         }
-        $hight_bit = substr($code,-1,1);
-        if(is_numeric($hight_bit)){
-            $hight =  abs((int)count($map)- (int)substr($code,'-1',1));
-            $code = substr($code,0,-1).$map[$hight];
+        $bit_last = substr($code,-1,1);
+        if(is_numeric($bit_last)){
+            $bit_last_value =  abs((int)count($bit_map)- (int)substr($code,'-1',1));
+            $code = substr($code,0,-1).$bit_map[$bit_last_value];
         }
         return $code;
     }
 
 
-    /**6位邀请码转换成指定数字
+    /**邀请码转换成 userid
      * @param string $code
      * @return false|float|int|string
      * @time 2020/11/17 16:12
      * @author LW
      */
-    public function codeSwitchUserId(string $code){
-        $map = [
+    function codeSwitchUserId(string $code){
+        $bit_map = [
             'G','H','I','J','K','L','O','M','N','P','Q','R','S','T','U','V','W','X','Y','Z'
         ];
         $bit_one = substr($code,0,1);
-        $hight = strtoupper(substr($code,-1,1));
-        if(is_numeric($hight)){
-            //特殊处理邀请码末尾不可能为数字
-            return 0;
-        }
-        $key = array_search($hight,$map);
+        $bit_zero_string = substr($code,1,1);
+        $bit_last = strtoupper(substr($code,-1,1));
+        if(is_numeric($bit_last)) return 0;									//特殊处理邀请码末尾不可能为数字
 
-        if($key !== false) {
-            $code = substr($code, 0, -1) . abs((int)count($map) - (int)$key);
+        $last_index = array_search($bit_last,$bit_map);
+
+        if($last_index !== false) {
+            $bit_last_original = abs((int)count($bit_map) - (int)$last_index); //末尾原始16进制值
+            $code = substr($code, 0, -1) . $bit_last_original;
         }
         if(!is_numeric($bit_one)){
-            $userId = in_array($bit_one,$map) ? substr($code,array_search($bit_one,$map)):hexdec($code);
+            $bit_diff = array_search($bit_one,$bit_map);					//位差,与7作比较
+            $zero_len_index = array_search($bit_zero_string,$bit_map);
+            $bit_zero_len = ($zero_len_index == false) ? 0 : (int)$zero_len_index - (int) $bit_diff;
+            $dechex_code = substr($code,$bit_zero_len + 1);
+            $userId = hexdec($dechex_code);
         }else{
             $userId = hexdec($code);
         }
         return $userId;
     }
+
 
     /**判断两个日期相差几天(天数)
      * @param string $date1
