@@ -79,7 +79,7 @@ trait HelperTraits{
      * @time 2020/11/17 16:13
      * @author LW
      */
-    function userIdSwitchCode(int $userId){
+    function numSwitchCode(int $userId){
         //位标识
         $bit_map = [
             'G','H','I','J','K','L','O','M','N','P','Q','R','S','T','U','V','W','X','Y','Z'
@@ -120,7 +120,7 @@ trait HelperTraits{
      * @time 2020/11/17 16:12
      * @author LW
      */
-    function codeSwitchUserId(string $code){
+    function codeSwitchNum(string $code){
         $bit_map = [
             'G','H','I','J','K','L','O','M','N','P','Q','R','S','T','U','V','W','X','Y','Z'
         ];
