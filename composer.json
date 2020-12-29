@@ -13,5 +13,11 @@
         }
     ],
     "autoload": {
+        "psr-4": {
+            "commonfunc\\traits\\": "src/traits"
+        },
+        "files": [
+            "src/traits/HelperTraits.php"
+        ]
     }
 }
