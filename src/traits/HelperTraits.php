@@ -74,20 +74,20 @@ trait HelperTraits{
 
 
     /**将指定数字转换成特殊码(6位以上)
-     * @param int $userId
+     * @param int $num
      * @return string
      * @time 2020/11/17 16:13
      * @author LW
      */
-    function numSwitchCode(int $userId){
+    function numSwitchCode(int $num){
         //位标识
         $bit_map = [
             'G','H','I','J','K','L','O','M','N','P','Q','R','S','T','U','V','W','X','Y','Z'
         ];
-        $diff = 7- (int)strlen($userId);
+        $diff = 7- (int)strlen($num);
         if($diff > 0){
             $bit_one = $bit_map[$diff];
-            $dechex_code = strtoupper(dechex($userId));
+            $dechex_code = strtoupper(dechex($num));
             $bit_zero_len = 5 - (int)strlen($dechex_code);
             $bit_zero_string = $bit_zero_len > 0 ? $bit_map[$diff + $bit_zero_len] : '';
             if($bit_zero_len > 2){
@@ -103,7 +103,7 @@ trait HelperTraits{
             }
             $code = $bit_one.trim($bit_zero_string).$dechex_code;
         }else{
-            $code = strtoupper(dechex($userId));
+            $code = strtoupper(dechex($num));
         }
         $bit_last = substr($code,-1,1);
         if(is_numeric($bit_last)){
