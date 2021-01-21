@@ -10,6 +10,26 @@ namespace commonfunc\traits\helper;
 
 trait HelperTraits{
 
+
+    /**判断字符串是否是base64位
+     * @param $str
+     * @return bool
+     * @time 2021/1/11 17:33
+     * @author LW
+     */
+    public function isBase64($str)
+    {
+        $str = preg_replace("/ /","+",$str);
+        //这里多了个纯字母和纯数字的正则判断
+        if (@preg_match('/^[0-9]*$/', $str) || @preg_match('/^[a-zA-Z]*$/', $str)) {
+            return false;
+        } elseif (is_utf8(base64_decode($str)) && base64_decode($str) != '' && $str == base64_encode(base64_decode($str)) ) {
+            return true;
+        }
+        return false;
+    }
+
+
     /**从文本中解析出所@的用户信息 (文本中的 @格式: [@username #HJW-AT#userId] )
      * @param string $text
      * @return array
